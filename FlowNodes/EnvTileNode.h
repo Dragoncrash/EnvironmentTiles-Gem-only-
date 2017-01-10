@@ -3,6 +3,7 @@
 #include <IFlowSystem.h>
 
 
+
 #pragma region Env_TileSystemComponent
 /////////////////////////////////////////////
 //Env_TileSystemComponent Nodes
@@ -215,8 +216,15 @@ private:
 	};
 	enum OutputPorts{
 		EntityName,
-		Amount
-		//Add more later
+		isRain,
+		isSnow,
+		isSimple,
+		Amount,
+		Rain_Lightning_Enabled,
+		Rain_Thunder_Enabled,
+		//Thunder Sound through UI and Flowgraph here [TODO]
+		Snow_FreezeGround,//[EXPERIMENTAL]->Check the Snow Entity Flownode (if there is one)
+		Snow_FrostAmount//[EXPERIMENTAL]->Check the Snow Entity Flownode (if there is one)
 	};
 };
 

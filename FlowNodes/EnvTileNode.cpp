@@ -3,6 +3,8 @@
 #include "../../../Gems/Env_Tile/Code/Include/Env_Tile/Env_TileBus.h"
 #include "../../../Gems/Env_Tile/Code/Include/Env_Tile/WeatherStructs.h"
 
+
+
 #pragma region Env_TileSystemComponent
 //Simple Weather Enable
 void EnvTileNode_SimpleEnables::GetConfiguration(SFlowNodeConfig& config){
@@ -29,6 +31,7 @@ void EnvTileNode_SimpleEnables::GetConfiguration(SFlowNodeConfig& config){
 
 void EnvTileNode_SimpleEnables::ProcessEvent(EFlowEvent event, SActivationInfo* info){
 	FlowEntityType fet = GetFlowEntityTypeFromFlowEntityId(info->entityId);
+	
 	AZ_Assert((fet == FlowEntityType::Component) || (fet == FlowEntityType::Invalid),
 		"This node is incompatible with Legacy Entities");
 	if (fet == FlowEntityType::Component){
