@@ -365,7 +365,15 @@ void EnvGenNode_TOD_Activation::GetConfiguration(SFlowNodeConfig& config){
 
 	static const SOutputPortConfig out_config[] = {
 		OutputPortConfig<string>("Entity Name", "The Name of the Weather Entity to modify."),
+		OutputPortConfig<bool>("isRain", _HELP("True if the triggered event was rain.")),
+		OutputPortConfig<bool>("isSnow", _HELP("True if the triggered event was snow")),
+		OutputPortConfig<bool>("isSimple", _HELP("True if the triggered event was a simple weather event")),
 		OutputPortConfig<float>("Amount", "Global Amount of Weather Effect to apply."),
+		OutputPortConfig<bool>("Rain Lightning Enabled", _HELP("True if Lightning is enabled (Only active in Rain)")),
+		OutputPortConfig<bool>("Rain Thunder Enabled", _HELP("True if Thunder is enabled (Only active in Rain)")),
+		OutputPortConfig<bool>("Snow Freeze Enable", _HELP("True if the Snow causes ground to freeze")),
+		OutputPortConfig<float>("Snow Frost Amount", _HELP("How frozen the ground should be (Only active in Snow")),
+		//[TODO: Refer to Snow Entity Node (if there is one) to add any extra configuration outputs]
 		{ 0 }
 	};
 
@@ -401,7 +409,7 @@ void EnvGenNode_TOD_Activation::ProcessEvent(EFlowEvent event, SActivationInfo* 
 				EBUS_EVENT_ID(info->entityId, Env_Tile::Env_GeneratorRequestBus, preloadTriggersAtTime, index);
 			}
 
-			//Process Triggers
+			//Process Triggers -> Should be called once per game update call
 			bool queue_empty;
 			EBUS_EVENT_ID_RESULT(queue_empty, info->entityId, Env_Tile::Env_GeneratorRequestBus, triggerListEmpty);
 
@@ -409,8 +417,55 @@ void EnvGenNode_TOD_Activation::ProcessEvent(EFlowEvent event, SActivationInfo* 
 				Env_Tile::WeatherUnit w;
 				EBUS_EVENT_ID_RESULT(w, info->entityId, Env_Tile::Env_GeneratorRequestBus, processNextTrigger);
 
-				//Decode struct
+				//Decode struct [TODO: ADD IN SIMPLE OPTION]
+				if (w.t_rain > 0){
+					//Is a rain trigger
+					
+					//Determine Entity Name following the convention [Weather]Tile_[index]
+					//NOTE: Name convention uses zero-based indexing
+					string e_name = "RainTile_" + w.tileNumber;
+					ActivateOutput(info, OutputPorts::EntityName, e_name);
+					
+					//Set trigger type output
+					ActivateOutput(info, OutputPorts::isRain, true);
+					ActivateOutput(info, OutputPorts::isSnow, false);
+					ActivateOutput(info, OutputPorts::isSimple, false);
 
+					//Set weather effect amount output
+					ActivateOutput(info, OutputPorts::Amount, w.t_rain);
+
+					//Set Extras
+					ActivateOutput(info, OutputPorts::Rain_Lightning_Enabled, w.t_rain_extra_lightning);
+					ActivateOutput(info, OutputPorts::Rain_Thunder_Enabled, w.t_rain_extra_thunder);
+					ActivateOutput(info, OutputPorts::Snow_FreezeGround, false);
+					ActivateOutput(info, OutputPorts::Snow_FrostAmount, 0.0);
+
+				}
+				else if (w.t_snow > 0){
+					//Is a rain trigger
+
+					//Determine Entity Name following the convention [Weather]Tile_[index]
+					//NOTE: Name convention uses zero-based indexing
+					string e_name = "SnowTile_" + w.tileNumber;
+					ActivateOutput(info, OutputPorts::EntityName, e_name);
+
+					//Set trigger type output
+					ActivateOutput(info, OutputPorts::isRain, false);
+					ActivateOutput(info, OutputPorts::isSnow, true);
+					ActivateOutput(info, OutputPorts::isSimple, false);
+
+					//Set weather effect amount output
+					ActivateOutput(info, OutputPorts::Amount, w.t_snow);
+
+					//Set Extras
+					ActivateOutput(info, OutputPorts::Rain_Lightning_Enabled, false);
+					ActivateOutput(info, OutputPorts::Rain_Thunder_Enabled, false);
+					ActivateOutput(info, OutputPorts::Snow_FreezeGround, w.t_snow_extra_freeze);
+					ActivateOutput(info, OutputPorts::Snow_FrostAmount, w.t_snow_extra_f_amount);
+				}
+				else{
+					CryLog("EnvGenNode_TOD_Activation::ProcessEvent : Reached Unimplemented Option");
+				}
 			}
 
 
@@ -428,3 +483,4 @@ REGISTER_FLOW_NODE("ComponentEntity:Env_Tile:Snow:Default", EnvTileNode_Snow)
 REGISTER_FLOW_NODE("ComponentEntity:Env_Tile:Rain:Extra", EnvTileNode_RainExtra)
 REGISTER_FLOW_NODE("ComponentEntity:Env_Tile:Snow:Extra", EnvTileNode_SnowExtra)
 REGISTER_FLOW_NODE("ComponentEntity:Generator:GeneratorParams", EnvGenNode_Generator)
+REGISTER_FLOW_NODE("ComponentEntity:Generator:TOD Trigger Activation", EnvGenNode_TOD_Activation)
