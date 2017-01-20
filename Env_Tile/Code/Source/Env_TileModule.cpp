@@ -20,7 +20,7 @@ namespace Env_Tile
         {
             // Push results of [MyComponent]::CreateDescriptor() into m_descriptors here.
             m_descriptors.insert(m_descriptors.end(), {
-                Env_TileSystemComponent::CreateDescriptor(),
+                //Env_TileSystemComponent::CreateDescriptor(),
 				Env_TileGenerator::CreateDescriptor(),
             });
         }
@@ -31,7 +31,7 @@ namespace Env_Tile
         AZ::ComponentTypeList GetRequiredSystemComponents() const override
         {
             return AZ::ComponentTypeList{
-                azrtti_typeid<Env_TileSystemComponent>(),
+                azrtti_typeid<Env_TileGenerator>(),
             };
         }
     };

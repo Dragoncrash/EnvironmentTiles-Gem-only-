@@ -28,10 +28,13 @@
 
 namespace Env_Tile
 {
+
+	//[REMOVE CLASS ON PHASEOUT//]
+#pragma region PHASEOUT
 	///////////////////////////////////////////////////////////
 	//CLASS: ENV_TileSystemComponent
 	///////////////////////////////////////////////////////////
-    void Env_TileSystemComponent::Reflect(AZ::ReflectContext* context)
+    /*void Env_TileSystemComponent::Reflect(AZ::ReflectContext* context)
     {
         if (AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context))
         {
@@ -40,29 +43,7 @@ namespace Env_Tile
 				
 				//Tile
 				
-				//Simple Weather
-				->Field("Cloudy", &Env_TileSystemComponent::Cloudy)
-				->Field("Windy", &Env_TileSystemComponent::Windy)
 				
-				//Complex Weather: Rain
-				->Field("Rain Enabled",&Env_TileSystemComponent::RAIN_ENABLED)
-				->Field("Light Rain", &Env_TileSystemComponent::rain_strength_light)
-				->Field("Medium Rain", &Env_TileSystemComponent::rain_strength_medium)
-				->Field("Heavy Rain", &Env_TileSystemComponent::rain_strength_heavy)
-				->Field("Thunder Enabled", &Env_TileSystemComponent::rain_extra_Thunder)
-				->Field("Lightning Enabled", &Env_TileSystemComponent::rain_extra_Lightning)
-				->Field("Rain TOD Low Limit", &Env_TileSystemComponent::rain_TOD_Range_Start)
-				->Field("Rain TOD High Limit", &Env_TileSystemComponent::rain_TOD_Range_Stop)
-				
-				//Complex Weather: Snow
-				->Field("Snow Enabled", &Env_TileSystemComponent::SNOW_ENABLED)
-				->Field("Light Snow", &Env_TileSystemComponent::snow_strength_light)
-				->Field("Medium Snow", &Env_TileSystemComponent::snow_strength_medium)
-				->Field("Heavy Snow", &Env_TileSystemComponent::snow_strength_heavy)
-				->Field("Freeze Ground", &Env_TileSystemComponent::snow_extra_FreezeGround)
-				->Field("Freeze Amount", &Env_TileSystemComponent::snow_extra_FreezeAmount)
-				->Field("Snow TOD Low Limit", &Env_TileSystemComponent::snow_TOD_Range_Start)
-				->Field("Snow TOD High Limit", &Env_TileSystemComponent::snow_TOD_Range_Stop)
 				;
 
             if (AZ::EditContext* ec = serialize->GetEditContext())
@@ -75,89 +56,15 @@ namespace Env_Tile
 					->Attribute(AZ::Edit::Attributes::Icon, "Editor/Icons/Components/StaticMesh")
 					->Attribute(AZ::Edit::Attributes::ViewportIcon,"Editor/Icons/Components/Viewport/StaticMesh.png")
 
-					//Tile Section
-					->ClassElement(GRP, "Environment Tile Settings")
-					->Attribute(AZ::Edit::Attributes::AutoExpand,true)
 					
-					//Simple Weather Section
-					->ClassElement(GRP, "Simple Weather")
-					->Attribute(AZ::Edit::Attributes::AutoExpand, false)
-					
-					
-					//*****************************************//
-					//TODO: CREATE CALLBACKS FOR THE FOLLOWING!
-					//*****************************************//
-					//Cloudy
-					->DataElement(UI_D, &Env_TileSystemComponent::Cloudy, "Cloudy", "Allows simple, cloudy weather if checked.")
-					//Windy
-					->DataElement(UI_D, &Env_TileSystemComponent::Windy, "Windy", "Allows simple, windy weather if checked.")
-					
-					//Rain Section
-					->ClassElement(GRP, "Complex: Rain")
-					->Attribute(AZ::Edit::Attributes::AutoExpand, false)
-					//Intensity
-					->DataElement(UI_D, &Env_TileSystemComponent::rain_strength_light, "Light Showers", "Allows tile to generate light rain showers.")
-					->Attribute(CN, &Env_TileSystemComponent::checkRainEnabled)
-					
-					->DataElement(UI_D, &Env_TileSystemComponent::rain_strength_medium, "Regular Showers", "Allows tile to generate regular rain showers.")
-					->Attribute(CN, &Env_TileSystemComponent::checkRainEnabled)
-					
-					->DataElement(UI_D, &Env_TileSystemComponent::rain_strength_heavy, "Heavy Storm Showers", "Allows tile to generate heavy storm rain.")
-					->Attribute(CN, &Env_TileSystemComponent::checkRainEnabled)
-					
-					//Extras
-					->DataElement(UI_D, &Env_TileSystemComponent::rain_extra_Thunder, "Thunder", "Allows thunder when rain is enabled.")
-					->DataElement(UI_D, &Env_TileSystemComponent::rain_extra_Lightning, "Lightning", "Allows lightning when rain is enabled.")
-					//TODO: FIGURE OUT HOW TO ADD A SOUND INPUT HERE FOR THUNDER SOUND
-					
-					//RAIN_TOD
-					->DataElement(UI_SL, &Env_TileSystemComponent::rain_TOD_Range_Start, "TOD_Start", "The Time of Day value at which this weather effect will begin to be applicable.")
-					->Attribute(AZ::Edit::Attributes::Min,0)
-					->Attribute(AZ::Edit::Attributes::Max, 24)
-					->Attribute(AZ::Edit::Attributes::Step, 1)
-					->Attribute(CN, &Env_TileSystemComponent::OnRainStartTODChanged)
-
-					->DataElement(UI_SL, &Env_TileSystemComponent::rain_TOD_Range_Stop, "TOD_Stop", "The Time of Day value at which this weather effect will no longer be applicable.")
-					->Attribute(AZ::Edit::Attributes::Min,0)
-					->Attribute(AZ::Edit::Attributes::Max, 24)
-					->Attribute(AZ::Edit::Attributes::Step, 1)
-					->Attribute(CN, &Env_TileSystemComponent::OnRainStopTODChanged)
-
-					//Snowfall Section
-					->ClassElement(GRP, "Complex: Snowfall")
-					->Attribute(AZ::Edit::Attributes::AutoExpand, false)
-					//Intensity
-					->DataElement(UI_D, &Env_TileSystemComponent::snow_strength_light, "Light Snowfall", "Allows tile to generate light snowfall.")
-					->DataElement(UI_D, &Env_TileSystemComponent::snow_strength_medium, "Regular Snowfall", "Allows tile to generate regular snowfall.")
-					->DataElement(UI_D, &Env_TileSystemComponent::snow_strength_heavy, "Heavy Snowfall", "Allows tile to generate heavy snowfall.")
-					//Extras
-					->DataElement(UI_D, &Env_TileSystemComponent::snow_extra_FreezeGround, "Freeze Ground", "Will render snow overlays on terrain mesh. NOTE: This will not affect static meshes.")
-					
-					->DataElement(UI_SL, &Env_TileSystemComponent::snow_extra_FreezeAmount, "Freeze Amount", "Influence of the freezing on the terrain when Freeze Ground is enabled.")
-					->Attribute(AZ::Edit::Attributes::Min, 0.0f)
-					->Attribute(AZ::Edit::Attributes::Max, 1.0f)
-					->Attribute(AZ::Edit::Attributes::Step, 0.01f)
-
-					//SNOW_TOD
-					->DataElement(UI_SL, &Env_TileSystemComponent::snow_TOD_Range_Start, "TOD_Start", "The Time of Day value at which this weather effect will begin to be applicable.")
-					->Attribute(AZ::Edit::Attributes::Min, 0)
-					->Attribute(AZ::Edit::Attributes::Max, 24)
-					->Attribute(AZ::Edit::Attributes::Step, 1)
-					->Attribute(CN, &Env_TileSystemComponent::OnSnowStartTODChanged)
-
-					->DataElement(UI_SL, &Env_TileSystemComponent::snow_TOD_Range_Stop, "TOD_Stop", "The Time of Day value at which this weather effect will no longer be applicable.")
-					->Attribute(AZ::Edit::Attributes::Min, 0)
-					->Attribute(AZ::Edit::Attributes::Max, 24)
-					->Attribute(AZ::Edit::Attributes::Step, 1)
-					->Attribute(CN, &Env_TileSystemComponent::OnSnowStopTODChanged)
 					
 					;
                     
             }
         }
     }
-
-    void Env_TileSystemComponent::GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided)
+	*/
+   /* void Env_TileSystemComponent::GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided)
     {
         provided.push_back(AZ_CRC("Env_TileService"));
     }
@@ -178,154 +85,7 @@ namespace Env_Tile
     }
 
 
-	///////////////////////////////////////////////////////////
-	//Node Functions 
-	///////////////////////////////////////////////////////////
-	int Env_TileSystemComponent::getSimple(){
-		//Output will be 0,1,2 or 3
-		return (int)Cloudy + (2*(int)Windy);
-	}
-
-	int Env_TileSystemComponent::getRainStrengths(){
-		int result = 0;
-		//Treat as binary bitmask (8bit)
-		if (rain_strength_light) result += 1;
-		if (rain_strength_medium)result += 2;
-		if (rain_strength_heavy) result += 4;
-
-		return result;
-	}
-
-	int Env_TileSystemComponent::getRainExtra(){
-		return (int)rain_extra_Thunder + (2 * (int)rain_extra_Lightning);
-	}
-
-	int Env_TileSystemComponent::getRainTODStart(){
-		return rain_TOD_Range_Start;
-	}
-
-	int Env_TileSystemComponent::getRainTODStop(){
-		return rain_TOD_Range_Stop;
-	}
-
-	int Env_TileSystemComponent::getSnowStrengths(){
-		int result = 0;
-		//Same as rain: 8bit bitmask
-		if (snow_strength_light) result += 1;
-		if (snow_strength_medium)result += 2;
-		if (snow_strength_heavy) result += 4;
-
-		return result;
-	}
-
-	bool Env_TileSystemComponent::getSnowFreezeGround(){
-		return snow_extra_FreezeGround;
-	}
-
-	float Env_TileSystemComponent::getSnowFreezeAmount(){
-		return snow_extra_FreezeAmount;
-	}
-
-	int Env_TileSystemComponent::getSnowTODStart(){
-		return snow_TOD_Range_Start;
-	}
-
-	int Env_TileSystemComponent::getSnowTODStop(){
-		return snow_TOD_Range_Stop;
-	}
-
-	int Env_TileSystemComponent::setSimple(bool cloudy, bool windy){
-		Cloudy = cloudy;
-		Windy = windy;
-		return getSimple();
-	}
-
-	int Env_TileSystemComponent::setRainStrengths(bool low, bool mid, bool hi){
-		rain_strength_light = low;
-		rain_strength_medium = mid;
-		rain_strength_heavy = hi;
-		return getRainStrengths();
-	}
-
-	int Env_TileSystemComponent::setRainExtra(bool thunder, bool lightning){
-		rain_extra_Thunder = thunder;
-		rain_extra_Lightning = lightning;
-		return getRainExtra();
-	}
-
-	int Env_TileSystemComponent::setRainTODStart(int val){
-		rain_TOD_Range_Start = val;
-		return rain_TOD_Range_Start;
-	}
-
-	int Env_TileSystemComponent::setRainTODStop(int val){
-		rain_TOD_Range_Stop = val;
-		return rain_TOD_Range_Stop;
-	}
-
-	int Env_TileSystemComponent::setSnowStrengths(bool low, bool mid, bool hi){
-		snow_strength_light = low;
-		snow_strength_medium = mid;
-		snow_strength_heavy = hi;
-		return getSnowStrengths();
-	}
-
-	bool Env_TileSystemComponent::setSnowFreezeGround(bool freeze){
-		snow_extra_FreezeGround = freeze;
-		return snow_extra_FreezeGround;
-	}
-
-	float Env_TileSystemComponent::setSnowFreezeAmount(float amt){
-		snow_extra_FreezeAmount = amt;
-		return snow_extra_FreezeAmount;
-	}
-
-	int Env_TileSystemComponent::setSnowTODStart(int val) {
-		snow_TOD_Range_Start = val;
-		return snow_TOD_Range_Start;
-	}
-
-	int Env_TileSystemComponent::setSnowTODStop(int val){
-		snow_TOD_Range_Stop = val;
-		return snow_TOD_Range_Stop;
-	}
-	///////////////////////////////////////////////////////////
-	//UI NotifyFunctions
-	///////////////////////////////////////////////////////////
-	void Env_TileSystemComponent::checkRainEnabled(){
-		if (rain_strength_light || rain_strength_medium || rain_strength_heavy)
-			RAIN_ENABLED = true;
-		else
-			RAIN_ENABLED = false;
-	}
-
-	AZ::u32 Env_TileSystemComponent::OnRainStartTODChanged(){
-		//Ensure bound integrity is maintained
-		if (rain_TOD_Range_Start > rain_TOD_Range_Stop)
-			rain_TOD_Range_Stop = rain_TOD_Range_Start;
-		return AZ_CRC("RefreshValues");
-	}
-
-	AZ::u32 Env_TileSystemComponent::OnRainStopTODChanged(){
-		//Ensure bound integrity is maintained
-		if (rain_TOD_Range_Start > rain_TOD_Range_Stop)
-			rain_TOD_Range_Start = rain_TOD_Range_Stop;
-		return AZ_CRC("RefreshValues");
-	}
-
-	AZ::u32 Env_TileSystemComponent::OnSnowStartTODChanged(){
-		//Ensure bound integrity is maintained
-		if (snow_TOD_Range_Start > snow_TOD_Range_Stop)
-			snow_TOD_Range_Stop = snow_TOD_Range_Start;
-		return AZ_CRC("RefreshValues");
-	}
-
-	AZ::u32 Env_TileSystemComponent::OnSnowStopTODChanged(){
-		//Ensure bound integrity is maintained
-		if (snow_TOD_Range_Start > snow_TOD_Range_Stop)
-			snow_TOD_Range_Start = snow_TOD_Range_Stop;
-		return AZ_CRC("RefreshValues");
-	}
+	
 	
 	///////////////////////////////////////////////////////////
 	//Component Interface Functions
@@ -342,16 +102,23 @@ namespace Env_Tile
     {
         Env_TileRequestBus::Handler::BusDisconnect();
     }
-
+	*/
+#pragma endregion PHASEOUT
 
 	///////////////////////////////////////////////////////////
 	//CLASS: ENV_TileGenerator
 	///////////////////////////////////////////////////////////
+#pragma region Component
 	Env_TileGenerator::Env_TileGenerator(){
 		//Taken from SpawnerComponent. Not sure what this does yet
 		for (auto iter = sliceList.begin(); iter != sliceList.end(); iter++){
 			iter->SetFlags(static_cast<AZ::u8>(AZ::Data::AssetFlags::OBJECTSTREAM_NO_LOAD));
 		}
+		/*for (auto v : sliceList){
+			for (auto iter = v.begin(); iter != v.end(); iter++){
+				iter->SetFlags(static_cast<AZ::u8>(AZ::Data::AssetFlags::OBJECTSTREAM_NO_LOAD));
+			}
+		}*/
 	}
 
 	void Env_TileGenerator::Reflect(AZ::ReflectContext* context)
@@ -381,6 +148,33 @@ namespace Env_Tile
 				//Object and Transform Lists
 				->Field("sliceList", &Env_TileGenerator::sliceList)
 				->Field("sliceLocalTransformList", &Env_TileGenerator::sliceLocalTransforms)
+
+				//Simple Weather
+				->Field("Cloudy", &Env_TileGenerator::Cloudy)
+				->Field("Windy", &Env_TileGenerator::Windy)
+
+				//Complex Weather: Rain
+				->Field("Rain Enabled", &Env_TileGenerator::RAIN_ENABLED)
+				->Field("Light Rain", &Env_TileGenerator::rain_strength_light)
+				->Field("Medium Rain", &Env_TileGenerator::rain_strength_medium)
+				->Field("Heavy Rain", &Env_TileGenerator::rain_strength_heavy)
+				->Field("Thunder Enabled", &Env_TileGenerator::rain_extra_Thunder)
+				->Field("Lightning Enabled", &Env_TileGenerator::rain_extra_Lightning)
+				->Field("Rain TOD Low Limit", &Env_TileGenerator::rain_TOD_Range_Start)
+				->Field("Rain TOD High Limit", &Env_TileGenerator::rain_TOD_Range_Stop)
+
+				//Complex Weather: Snow
+				->Field("Snow Enabled", &Env_TileGenerator::SNOW_ENABLED)
+				->Field("Light Snow", &Env_TileGenerator::snow_strength_light)
+				->Field("Medium Snow", &Env_TileGenerator::snow_strength_medium)
+				->Field("Heavy Snow", &Env_TileGenerator::snow_strength_heavy)
+				->Field("Freeze Ground", &Env_TileGenerator::snow_extra_FreezeGround)
+				->Field("Freeze Amount", &Env_TileGenerator::snow_extra_FreezeAmount)
+				->Field("Snow TOD Low Limit", &Env_TileGenerator::snow_TOD_Range_Start)
+				->Field("Snow TOD High Limit", &Env_TileGenerator::snow_TOD_Range_Stop)
+
+				//Floating Islands
+				->Field("Floating Islands Slice List", &Env_TileGenerator::decoLayer)
 				;
 
 			if (AZ::EditContext* ec = serialize->GetEditContext())
@@ -393,8 +187,7 @@ namespace Env_Tile
 					->Attribute(AZ::Edit::Attributes::Icon, "Editor/Icons/Components/StaticMesh")
 					->Attribute(AZ::Edit::Attributes::ViewportIcon, "Editor/Icons/Components/Viewport/StaticMesh.png")
 
-					//Tile Section
-					->ClassElement(GRP, "Generator Settings")
+					->ClassElement(GRP, "Generator PCG")
 					->Attribute(AZ::Edit::Attributes::AutoExpand, true)
 					
 					->DataElement(UI_SP, &Env_TileGenerator::maxRowSize, "Max Row Length", "Maximum row length before starting a new row. Ignored for Manual mode.")
@@ -436,10 +229,83 @@ namespace Env_Tile
 					->DataElement(UI_D, &Env_TileGenerator::offscale, "Additional Scaling", "Amount to adjust tile scale.")
 					->Attribute(CN, &Env_TileGenerator::onLocalTransformChanged)
 
+					//Need to have 2D list of compatible slices [TODO]
+
+
+					//Simple Weather Section
+					->ClassElement(GRP, "Simple Weather")
+					->Attribute(AZ::Edit::Attributes::AutoExpand, false)
+
+					//Cloudy
+					->DataElement(UI_D, &Env_TileGenerator::Cloudy, "Cloudy", "Allows simple, cloudy weather if checked.")
+					//Windy
+					->DataElement(UI_D, &Env_TileGenerator::Windy, "Windy", "Allows simple, windy weather if checked.")
+
+					//Rain Section
+					->ClassElement(GRP, "Complex: Rain")
+					->Attribute(AZ::Edit::Attributes::AutoExpand, false)
+					//Intensity
+					->DataElement(UI_D, &Env_TileGenerator::rain_strength_light, "Light Showers", "Allows tile to generate light rain showers.")
+					->Attribute(CN, &Env_TileGenerator::checkRainEnabled)
+
+					->DataElement(UI_D, &Env_TileGenerator::rain_strength_medium, "Regular Showers", "Allows tile to generate regular rain showers.")
+					->Attribute(CN, &Env_TileGenerator::checkRainEnabled)
+
+					->DataElement(UI_D, &Env_TileGenerator::rain_strength_heavy, "Heavy Storm Showers", "Allows tile to generate heavy storm rain.")
+					->Attribute(CN, &Env_TileGenerator::checkRainEnabled)
+
+					//Extras
+					->DataElement(UI_D, &Env_TileGenerator::rain_extra_Thunder, "Thunder", "Allows thunder when rain is enabled.")
+					->DataElement(UI_D, &Env_TileGenerator::rain_extra_Lightning, "Lightning", "Allows lightning when rain is enabled.")
+					//TODO: FIGURE OUT HOW TO ADD A SOUND INPUT HERE FOR THUNDER SOUND
+
+					//RAIN_TOD
+					->DataElement(UI_SL, &Env_TileGenerator::rain_TOD_Range_Start, "TOD_Start", "The Time of Day value at which this weather effect will begin to be applicable.")
+					->Attribute(AZ::Edit::Attributes::Min, 0)
+					->Attribute(AZ::Edit::Attributes::Max, 24)
+					->Attribute(AZ::Edit::Attributes::Step, 1)
+					->Attribute(CN, &Env_TileGenerator::OnRainStartTODChanged)
+
+					->DataElement(UI_SL, &Env_TileGenerator::rain_TOD_Range_Stop, "TOD_Stop", "The Time of Day value at which this weather effect will no longer be applicable.")
+					->Attribute(AZ::Edit::Attributes::Min, 0)
+					->Attribute(AZ::Edit::Attributes::Max, 24)
+					->Attribute(AZ::Edit::Attributes::Step, 1)
+					->Attribute(CN, &Env_TileGenerator::OnRainStopTODChanged)
+
+					//Snowfall Section
+					->ClassElement(GRP, "Complex: Snowfall")
+					->Attribute(AZ::Edit::Attributes::AutoExpand, false)
+					//Intensity
+					->DataElement(UI_D, &Env_TileGenerator::snow_strength_light, "Light Snowfall", "Allows tile to generate light snowfall.")
+					->DataElement(UI_D, &Env_TileGenerator::snow_strength_medium, "Regular Snowfall", "Allows tile to generate regular snowfall.")
+					->DataElement(UI_D, &Env_TileGenerator::snow_strength_heavy, "Heavy Snowfall", "Allows tile to generate heavy snowfall.")
+					//Extras
+					->DataElement(UI_D, &Env_TileGenerator::snow_extra_FreezeGround, "Freeze Ground", "Will render snow overlays on terrain mesh. NOTE: This will not affect static meshes.")
+
+					->DataElement(UI_SL, &Env_TileGenerator::snow_extra_FreezeAmount, "Freeze Amount", "Influence of the freezing on the terrain when Freeze Ground is enabled.")
+					->Attribute(AZ::Edit::Attributes::Min, 0.0f)
+					->Attribute(AZ::Edit::Attributes::Max, 1.0f)
+					->Attribute(AZ::Edit::Attributes::Step, 0.01f)
+
+					//SNOW_TOD
+					->DataElement(UI_SL, &Env_TileGenerator::snow_TOD_Range_Start, "TOD_Start", "The Time of Day value at which this weather effect will begin to be applicable.")
+					->Attribute(AZ::Edit::Attributes::Min, 0)
+					->Attribute(AZ::Edit::Attributes::Max, 24)
+					->Attribute(AZ::Edit::Attributes::Step, 1)
+					->Attribute(CN, &Env_TileGenerator::OnSnowStartTODChanged)
+
+					->DataElement(UI_SL, &Env_TileGenerator::snow_TOD_Range_Stop, "TOD_Stop", "The Time of Day value at which this weather effect will no longer be applicable.")
+					->Attribute(AZ::Edit::Attributes::Min, 0)
+					->Attribute(AZ::Edit::Attributes::Max, 24)
+					->Attribute(AZ::Edit::Attributes::Step, 1)
+					->Attribute(CN, &Env_TileGenerator::OnSnowStopTODChanged)
 					//Seperate Slice List for UI Visibiltiy Toggle Behavior for above sections
-					->ClassElement(GRP, "Slice List")
-					->DataElement(UI_D, &Env_TileGenerator::sliceList, "Slice List", "List of generated slices")
+					->ClassElement(GRP, "Slice Lists")//Unnecessary Group Section
+					->DataElement(UI_D, &Env_TileGenerator::sliceList, "Base Slice List", "List of generated base slices")
 					->Attribute(CN, &Env_TileGenerator::onListLengthChanged)
+					//Floating Islands
+					->DataElement(UI_D, &Env_TileGenerator::decoLayer, "Decorative Layer Slice List", "Slices to spawn on top of base tile.")
+					
 					;
 
 			}
@@ -465,10 +331,156 @@ namespace Env_Tile
 	{
 		dependent.push_back(AZ_CRC("TransformService"));
 	}
+#pragma endregion Component
 	
+#pragma region UI and Node
+	int Env_TileGenerator::getSimple(){
+		//Output will be 0,1,2 or 3
+		return (int)Cloudy + (2 * (int)Windy);
+	}
+
+	int Env_TileGenerator::getRainStrengths(){
+		int result = 0;
+		//Treat as binary bitmask (8bit)
+		if (rain_strength_light) result += 1;
+		if (rain_strength_medium)result += 2;
+		if (rain_strength_heavy) result += 4;
+
+		return result;
+	}
+
+	int Env_TileGenerator::getRainExtra(){
+		return (int)rain_extra_Thunder + (2 * (int)rain_extra_Lightning);
+	}
+
+	int Env_TileGenerator::getRainTODStart(){
+		return rain_TOD_Range_Start;
+	}
+
+	int Env_TileGenerator::getRainTODStop(){
+		return rain_TOD_Range_Stop;
+	}
+
+	int Env_TileGenerator::getSnowStrengths(){
+		int result = 0;
+		//Same as rain: 8bit bitmask
+		if (snow_strength_light) result += 1;
+		if (snow_strength_medium)result += 2;
+		if (snow_strength_heavy) result += 4;
+
+		return result;
+	}
+
+	bool Env_TileGenerator::getSnowFreezeGround(){
+		return snow_extra_FreezeGround;
+	}
+
+	float Env_TileGenerator::getSnowFreezeAmount(){
+		return snow_extra_FreezeAmount;
+	}
+
+	int Env_TileGenerator::getSnowTODStart(){
+		return snow_TOD_Range_Start;
+	}
+
+	int Env_TileGenerator::getSnowTODStop(){
+		return snow_TOD_Range_Stop;
+	}
+
+	int Env_TileGenerator::setSimple(bool cloudy, bool windy){
+		Cloudy = cloudy;
+		Windy = windy;
+		return getSimple();
+	}
+
+	int Env_TileGenerator::setRainStrengths(bool low, bool mid, bool hi){
+		rain_strength_light = low;
+		rain_strength_medium = mid;
+		rain_strength_heavy = hi;
+		return getRainStrengths();
+	}
+
+	int Env_TileGenerator::setRainExtra(bool thunder, bool lightning){
+		rain_extra_Thunder = thunder;
+		rain_extra_Lightning = lightning;
+		return getRainExtra();
+	}
+
+	int Env_TileGenerator::setRainTODStart(int val){
+		rain_TOD_Range_Start = val;
+		return rain_TOD_Range_Start;
+	}
+
+	int Env_TileGenerator::setRainTODStop(int val){
+		rain_TOD_Range_Stop = val;
+		return rain_TOD_Range_Stop;
+	}
+
+	int Env_TileGenerator::setSnowStrengths(bool low, bool mid, bool hi){
+		snow_strength_light = low;
+		snow_strength_medium = mid;
+		snow_strength_heavy = hi;
+		return getSnowStrengths();
+	}
+
+	bool Env_TileGenerator::setSnowFreezeGround(bool freeze){
+		snow_extra_FreezeGround = freeze;
+		return snow_extra_FreezeGround;
+	}
+
+	float Env_TileGenerator::setSnowFreezeAmount(float amt){
+		snow_extra_FreezeAmount = amt;
+		return snow_extra_FreezeAmount;
+	}
+
+	int Env_TileGenerator::setSnowTODStart(int val) {
+		snow_TOD_Range_Start = val;
+		return snow_TOD_Range_Start;
+	}
+
+	int Env_TileGenerator::setSnowTODStop(int val){
+		snow_TOD_Range_Stop = val;
+		return snow_TOD_Range_Stop;
+	}
+
 	///////////////////////////////////////////////////////////
 	//UI NotifyFunctions
 	///////////////////////////////////////////////////////////
+	void Env_TileGenerator::checkRainEnabled(){
+		if (rain_strength_light || rain_strength_medium || rain_strength_heavy)
+			RAIN_ENABLED = true;
+		else
+			RAIN_ENABLED = false;
+	}
+
+	AZ::u32 Env_TileGenerator::OnRainStartTODChanged(){
+		//Ensure bound integrity is maintained
+		if (rain_TOD_Range_Start > rain_TOD_Range_Stop)
+			rain_TOD_Range_Stop = rain_TOD_Range_Start;
+		return AZ_CRC("RefreshValues");
+	}
+
+	AZ::u32 Env_TileGenerator::OnRainStopTODChanged(){
+		//Ensure bound integrity is maintained
+		if (rain_TOD_Range_Start > rain_TOD_Range_Stop)
+			rain_TOD_Range_Start = rain_TOD_Range_Stop;
+		return AZ_CRC("RefreshValues");
+	}
+
+	AZ::u32 Env_TileGenerator::OnSnowStartTODChanged(){
+		//Ensure bound integrity is maintained
+		if (snow_TOD_Range_Start > snow_TOD_Range_Stop)
+			snow_TOD_Range_Stop = snow_TOD_Range_Start;
+		return AZ_CRC("RefreshValues");
+	}
+
+	AZ::u32 Env_TileGenerator::OnSnowStopTODChanged(){
+		//Ensure bound integrity is maintained
+		if (snow_TOD_Range_Start > snow_TOD_Range_Stop)
+			snow_TOD_Range_Start = snow_TOD_Range_Stop;
+		return AZ_CRC("RefreshValues");
+	}
+	
 	AZ::u32 Env_TileGenerator::onListIndexChanged(){
 		//Show the selected slice's transform on editor panel
 		CryLog("List Index Changed!");
@@ -508,7 +520,9 @@ namespace Env_Tile
 
 		return AZ_CRC("RefreshValues");
 	}
+#pragma endregion UI and Node
 
+#pragma region EBus
 	///////////////////////////////////////////////////////////
 	//EBUS Generator Functions
 	///////////////////////////////////////////////////////////
@@ -541,7 +555,7 @@ namespace Env_Tile
 			CryLog("Slice Instantiated");
 		}
 		int loopLength = sp_Type == spawnType::Once ? sliceList.size() : maxTiles;
-		if (loopLength == tmp_spawned_tiles)PostActivate();//Entities have spawned and it is safe to iterate.
+		if (loopLength == tmp_spawned_tiles)PostActivate();//Base Tiles have spawned and it is safe to iterate.
 
 		EBUS_EVENT_ID(GetEntityId(), Env_TileNotificationBus, OnSpawned, ticket, entityIds);
 	}
@@ -550,10 +564,9 @@ namespace Env_Tile
 		AzFramework::SliceInstantiationResultBus::MultiHandler::BusDisconnect(*AzFramework::SliceInstantiationResultBus::GetCurrentBusId());
 		AZ_Error("Env_TileGenerator", false, "Slice '%s' failed to instantiate", sliceAssetId.ToString<AZStd::string>().c_str());
 	}
-
-	///////////////////////////////////////////////////////////
-	//Component Interface Functions
-	///////////////////////////////////////////////////////////
+#pragma endregion EBus
+	
+#pragma region Component Overrides
 	void Env_TileGenerator::Init(){}
 
 	void Env_TileGenerator::Activate()
@@ -611,11 +624,35 @@ namespace Env_Tile
 			}
 			//Spawn Slice
 			Gen_SpawnSliceRelative(sliceToSpawn, sliceTransform);
-			CryLog("Spawned Slice: %i", i);
+			CryLog("Spawned Base Slice: %i", i);
+
+			//Handle Decorative Slice Layer
+			//NOTE: ALL SUB-SLICES ARE SPAWNED. TO BYPASS THIS FOR VARIATIONS OF A SINGLE MODEL,
+			//	REPEAT THE SLICES IN THE BASE SLICE LIST
+			int tmp_sub_obj_count = 0;
+			if (decoLayer[i%sliceList.size()].size() > 0){
+				for (auto item : decoLayer[i%sliceList.size()]){
+					//Spawn at Tile Location (NOTE: BUILD SLICES ACCORDINGLY)
+					Gen_SpawnSliceRelative(item, sliceTransform);
+					CryLog("Base Tile %i: Spawned Sub Slice %i", i, tmp_sub_obj_count);
+					tmp_sub_obj_count++;
+				}
+			}
 		}
+
+		
+
 		//PostActivate();
 	}
 
+	void Env_TileGenerator::Deactivate()
+	{
+		Env_GeneratorRequestBus::Handler::BusDisconnect();
+	}
+
+#pragma endregion Component Overrides
+
+#pragma region Helper Functions
 	void Env_TileGenerator::PostActivate(){
 		for (int i = 0; i < 25; i++){ //[0-24]
 			WeatherTrigger tmp;
@@ -624,147 +661,150 @@ namespace Env_Tile
 		}
 		CryLog("Initialize Weather Trigger List [Success]");
 
-		CryLog("Entity IDs spawned and available: %i", entityIds.size());
+		//Construct List: one entry per hour (consider refining time gap to smaller increments)
+
+
 
 		//Initial pass to set up weatherlink vectors
-		for (int i = 0; i < entityIds.size(); i++){
-			//CryLog("Entity Number %i", i);//[TODO] Add Tile number property
-			
-			//Use EBUS to get Tile Parameters (Not sure how this will work for unsupported entites that cannot return a value)
-			int simple, r_strength, s_strength, r_extra;
-			bool s_extra_freeze;
-			float s_extra_freeze_amount;
-			int r_todstart, r_todstop, s_todstart, s_todstop;
-			EBUS_EVENT_ID_RESULT(simple, entityIds[i], Env_Tile::Env_TileRequestBus, getSimple);
-			EBUS_EVENT_ID_RESULT(r_strength, entityIds[i], Env_Tile::Env_TileRequestBus, getRainStrengths);
-			EBUS_EVENT_ID_RESULT(s_strength, entityIds[i], Env_Tile::Env_TileRequestBus, getSnowStrengths);
-			EBUS_EVENT_ID_RESULT(r_extra, entityIds[i], Env_Tile::Env_TileRequestBus, getRainExtra);
-			EBUS_EVENT_ID_RESULT(s_extra_freeze, entityIds[i], Env_Tile::Env_TileRequestBus, getSnowFreezeGround);
-			EBUS_EVENT_ID_RESULT(s_extra_freeze_amount, entityIds[i], Env_Tile::Env_TileRequestBus, getSnowFreezeAmount);
-			EBUS_EVENT_ID_RESULT(r_todstart, entityIds[i], Env_Tile::Env_TileRequestBus, getRainTODStart);
-			EBUS_EVENT_ID_RESULT(r_todstop, entityIds[i], Env_Tile::Env_TileRequestBus, getRainTODStop);
-			EBUS_EVENT_ID_RESULT(s_todstart, entityIds[i], Env_Tile::Env_TileRequestBus, getSnowTODStart);
-			EBUS_EVENT_ID_RESULT(s_todstop, entityIds[i], Env_Tile::Env_TileRequestBus, getSnowTODStop);
+		//for (int i = 0; i < entityIds.size(); i++){
+		//CryLog("Entity Number %i", i);//[TODO] Add Tile number property
 
-			//Set trigger properties and attach indices after extracting flags
-			//RAIN
-			if (r_strength > 0){//Rain is enabled
-				WeatherUnit tmp_start, tmp_end;
+		//Use EBUS to get Tile Parameters (Not sure how this will work for unsupported entites that cannot return a value)
+		/*	int simple = getSimple(),
+		r_strength = getRainStrengths(),
+		s_strength = getSnowStrengths(),
+		r_extra = getRainExtra();
+		bool s_extra_freeze = getSnowFreezeGround();
+		float s_extra_freeze_amount = getSnowFreezeAmount();
+		int r_todstart = getRainTODStart(),
+		r_todstop = getRainTODStop(),
+		s_todstart = getSnowTODStart(),
+		s_todstop = getSnowTODStop();*/
+		/*EBUS_EVENT_ID_RESULT(simple, entityIds[i], Env_Tile::Env_TileRequestBus, getSimple);
+		EBUS_EVENT_ID_RESULT(r_strength, entityIds[i], Env_Tile::Env_TileRequestBus, getRainStrengths);
+		EBUS_EVENT_ID_RESULT(s_strength, entityIds[i], Env_Tile::Env_TileRequestBus, getSnowStrengths);
+		EBUS_EVENT_ID_RESULT(r_extra, entityIds[i], Env_Tile::Env_TileRequestBus, getRainExtra);
+		EBUS_EVENT_ID_RESULT(s_extra_freeze, entityIds[i], Env_Tile::Env_TileRequestBus, getSnowFreezeGround);
+		EBUS_EVENT_ID_RESULT(s_extra_freeze_amount, entityIds[i], Env_Tile::Env_TileRequestBus, getSnowFreezeAmount);
+		EBUS_EVENT_ID_RESULT(r_todstart, entityIds[i], Env_Tile::Env_TileRequestBus, getRainTODStart);
+		EBUS_EVENT_ID_RESULT(r_todstop, entityIds[i], Env_Tile::Env_TileRequestBus, getRainTODStop);
+		EBUS_EVENT_ID_RESULT(s_todstart, entityIds[i], Env_Tile::Env_TileRequestBus, getSnowTODStart);
+		EBUS_EVENT_ID_RESULT(s_todstop, entityIds[i], Env_Tile::Env_TileRequestBus, getSnowTODStop);
+		*/
+		//Set trigger properties and attach indices after extracting flags
+		//RAIN
+		/*if (r_strength > 0){//Rain is enabled
+		WeatherUnit tmp_start, tmp_end;
 
-				tmp_start.start = true;
-				tmp_end.start = false;
+		tmp_start.start = true;
+		tmp_end.start = false;
 
-				//Simple Weather Addition
-				if (simple & 1){
-					tmp_start.t_cloud = 1;
-					tmp_end.t_cloud = 1;
-				}
-				if (simple & 2){
-					tmp_start.t_wind = 1;
-					tmp_end.t_wind = 1;
-				}
-
-				//Rain flags
-				tmp_start.t_rain = r_strength;
-				tmp_end.t_rain = r_strength;
-
-				if (r_extra & 1){
-					tmp_start.t_rain_extra_thunder = 1;
-					tmp_end.t_rain_extra_thunder = 1;
-				}
-				if (r_extra & 2){
-					tmp_start.t_rain_extra_lightning = 1;
-					tmp_end.t_rain_extra_lightning = 1;
-				}
-
-
-				//Tile
-				tmp_start.tileNumber = i;
-				tmp_end.tileNumber = i;
-
-				//Insert at TOD value
-				env_weather_trigger[r_todstart].triggerList.push_back(tmp_start);
-				env_weather_trigger[r_todstop].triggerList.push_back(tmp_end);
-
-			}
-
-			//SNOW
-			if (s_strength > 0){//Snow is enabled
-				WeatherUnit tmp_start, tmp_end;
-
-				tmp_start.start = true;
-				tmp_end.start = false;
-
-				//Simple Weather Addition
-				if (simple & 1){
-					tmp_start.t_cloud = 1;
-					tmp_end.t_cloud = 1;
-				}
-				if (simple & 2){
-					tmp_start.t_wind = 1;
-					tmp_end.t_wind = 1;
-				}
-
-				//Snow flags
-				tmp_start.t_snow = s_strength;
-				tmp_end.t_snow = s_strength;
-
-				tmp_start.t_snow_extra_freeze = s_extra_freeze;
-				tmp_start.t_snow_extra_f_amount = s_extra_freeze_amount;
-
-				tmp_end.t_snow_extra_freeze = s_extra_freeze;
-				tmp_end.t_snow_extra_f_amount = s_extra_freeze_amount;
-
-				//Tile
-				tmp_start.tileNumber = i;
-				tmp_end.tileNumber = i;
-
-				//Insert at TOD value
-				env_weather_trigger[s_todstart].triggerList.push_back(tmp_start);
-				env_weather_trigger[s_todstop].triggerList.push_back(tmp_end);
-			}
-
-			//SIMPLE ONLY [TODO]: Add in Simple TOD option
-			/*if (r_strength==0 && s_strength==0 && simple > 0){
-				WeatherUnit tmp_start, tmp_end;
-
-				if (simple & 1){
-					tmp_start.t_cloud = 1;
-					tmp_end.t_cloud = 1;
-				}
-				if (simple & 2){
-					tmp_start.t_wind = 1;
-					tmp_end.t_wind = 1;
-				}
-
-
-			}*/
+		//Simple Weather Addition
+		if (simple & 1){
+		tmp_start.t_cloud = 1;
+		tmp_end.t_cloud = 1;
 		}
+		if (simple & 2){
+		tmp_start.t_wind = 1;
+		tmp_end.t_wind = 1;
+		}
+
+		//Rain flags
+		tmp_start.t_rain = r_strength;
+		tmp_end.t_rain = r_strength;
+
+		if (r_extra & 1){
+		tmp_start.t_rain_extra_thunder = 1;
+		tmp_end.t_rain_extra_thunder = 1;
+		}
+		if (r_extra & 2){
+		tmp_start.t_rain_extra_lightning = 1;
+		tmp_end.t_rain_extra_lightning = 1;
+		}
+
+
+		//Tile
+		tmp_start.tileNumber = i;
+		tmp_end.tileNumber = i;
+
+		//Insert at TOD value
+		env_weather_trigger[r_todstart].triggerList.push_back(tmp_start);
+		env_weather_trigger[r_todstop].triggerList.push_back(tmp_end);
+
+		}
+
+		//SNOW
+		if (s_strength > 0){//Snow is enabled
+		WeatherUnit tmp_start, tmp_end;
+
+		tmp_start.start = true;
+		tmp_end.start = false;
+
+		//Simple Weather Addition
+		if (simple & 1){
+		tmp_start.t_cloud = 1;
+		tmp_end.t_cloud = 1;
+		}
+		if (simple & 2){
+		tmp_start.t_wind = 1;
+		tmp_end.t_wind = 1;
+		}
+
+		//Snow flags
+		tmp_start.t_snow = s_strength;
+		tmp_end.t_snow = s_strength;
+
+		tmp_start.t_snow_extra_freeze = s_extra_freeze;
+		tmp_start.t_snow_extra_f_amount = s_extra_freeze_amount;
+
+		tmp_end.t_snow_extra_freeze = s_extra_freeze;
+		tmp_end.t_snow_extra_f_amount = s_extra_freeze_amount;
+
+		//Tile
+		tmp_start.tileNumber = i;
+		tmp_end.tileNumber = i;
+
+		//Insert at TOD value
+		env_weather_trigger[s_todstart].triggerList.push_back(tmp_start);
+		env_weather_trigger[s_todstop].triggerList.push_back(tmp_end);
+		}
+		*/
+		//SIMPLE ONLY [TODO]: Add in Simple TOD option
+		/*if (r_strength==0 && s_strength==0 && simple > 0){
+		WeatherUnit tmp_start, tmp_end;
+
+		if (simple & 1){
+		tmp_start.t_cloud = 1;
+		tmp_end.t_cloud = 1;
+		}
+		if (simple & 2){
+		tmp_start.t_wind = 1;
+		tmp_end.t_wind = 1;
+		}
+
+
+		}*/
+		//}
 	}
 
 	void Env_TileGenerator::preloadTriggersAtTime(int tod){
-		CryLog("Loading Triggers for Time: %i", tod);
+		/*CryLog("Loading Triggers for Time: %i", tod);
 		for (WeatherUnit w : env_weather_trigger[tod].triggerList){
-			queueTriggers.push_back(w);//Manually push back instead of using op= to copy
+		queueTriggers.push_back(w);//Manually push back instead of using op= to copy
 		}
-		CryLog("Loaded %i Triggers", env_weather_trigger[tod].triggerList.size());
+		CryLog("Loaded %i Triggers", env_weather_trigger[tod].triggerList.size());*/
 	}
 
 	WeatherUnit Env_TileGenerator::processNextTrigger(){
+
+		//[REPLACE LIST LOADING WITH ITERATOR IMPLEMENTATION]
+
 		//NOTE: Must check that the container is not empty BEFORE using this function
 		WeatherUnit w = queueTriggers.front();
 		queueTriggers.pop_front();
 		return w;
 	}
-
-	void Env_TileGenerator::Deactivate()
-	{
-		Env_GeneratorRequestBus::Handler::BusDisconnect();
-	}
-
-	///////////////////////////////////////////////////////////
-	//Private Helper Functions
-	///////////////////////////////////////////////////////////
+	
 	AzFramework::SliceInstantiationTicket Env_TileGenerator::SpawnSliceInternal(const AZ::Data::Asset<AZ::Data::AssetData>& slice, const AZ::Transform& relative){
 		//Taken from SpawnerComponent
 
@@ -781,5 +821,6 @@ namespace Env_Tile
 
 		return ticket;
 	}
+#pragma endregion Helper Functions
 
 }
