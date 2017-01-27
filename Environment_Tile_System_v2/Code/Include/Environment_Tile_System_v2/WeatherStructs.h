@@ -4,7 +4,7 @@
 //Contains Structs used by the Weather System
 
 //Struct for weather trigger pairings [TODO] [REDESIGN]
-namespace Env_Tile{
+namespace EnvTile{
 	struct WeatherUnit{
 		//Accumulate weather flags and associate to tile indices
 		unsigned int t_wind : 1, t_cloud : 1, t_rain : 3,

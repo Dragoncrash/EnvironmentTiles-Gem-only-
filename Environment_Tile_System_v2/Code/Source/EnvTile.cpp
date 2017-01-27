@@ -4,7 +4,6 @@
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Component/Entity.h>
-#include <AzCore/EBus/ScriptBinder.h>//not required here as we are not exposing this component to LUA script
 #include <ISystem.h>
 #include <AzCore/Math/Quaternion.h>
 
@@ -14,10 +13,8 @@
 #include <AzFramework/Entity/GameEntityContextBus.h>
 #include <AzCore/Component/TransformBus.h>
 
-//Component Header
-#include "Env_TileSystemComponent.h"
+#include "EnvTile.h"
 
-//Way too much typing to get the UIHandler values. Hence macros. Refer to Reflect Functions below for usage
 #define UI_D  AZ::Edit::UIHandlers::Default
 #define UI_CB AZ::Edit::UIHandlers::ComboBox
 #define UI_SL AZ::Edit::UIHandlers::Slider
@@ -26,98 +23,71 @@
 #define CN    AZ::Edit::Attributes::ChangeNotify
 #define VS	  AZ::Edit::Attributes::Visibility
 
-namespace Env_Tile
+namespace EnvTile
 {
-
-	//[REMOVE CLASS ON PHASEOUT//]
-#pragma region PHASEOUT
-	///////////////////////////////////////////////////////////
-	//CLASS: ENV_TileSystemComponent
-	///////////////////////////////////////////////////////////
-    /*void Env_TileSystemComponent::Reflect(AZ::ReflectContext* context)
+   /* void Env_Tile::Reflect(AZ::ReflectContext* context)
     {
         if (AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context))
         {
-			serialize->Class<Env_TileSystemComponent, AZ::Component>()
-				->Version(0)
-				
-				//Tile
-				
-				
-				;
+            serialize->Class<Env_Tile, AZ::Component>()
+                ->Version(0)
+                ->SerializerForEmptyClass();
 
             if (AZ::EditContext* ec = serialize->GetEditContext())
             {
-				ec->Class<Env_TileSystemComponent>("Env_Tile", "An environment tile used for PCG purposes.")
-					->ClassElement(AZ::Edit::ClassElements::EditorData, "")
-					->Attribute(AZ::Edit::Attributes::Category, "Environment Tile System")
-					->Attribute(AZ::Edit::Attributes::AppearsInAddComponentMenu, AZ_CRC("Game"))
-					->Attribute(AZ::Edit::Attributes::AutoExpand, true)
-					->Attribute(AZ::Edit::Attributes::Icon, "Editor/Icons/Components/StaticMesh")
-					->Attribute(AZ::Edit::Attributes::ViewportIcon,"Editor/Icons/Components/Viewport/StaticMesh.png")
-
-					
-					
-					;
-                    
+                ec->Class<Env_Tile>("Environment_Tile_System_v2", "[Description of functionality provided by this System Component]")
+                    ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
+                        // ->Attribute(AZ::Edit::Attributes::Category, "") Set a category
+                        ->Attribute(AZ::Edit::Attributes::AppearsInAddComponentMenu, AZ_CRC("System"))
+                        ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
+                    ;
             }
         }
     }
-	*/
-   /* void Env_TileSystemComponent::GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided)
+
+    void Env_Tile::GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided)
     {
-        provided.push_back(AZ_CRC("Env_TileService"));
+        provided.push_back(AZ_CRC("Environment_Tile_System_v2Service"));
     }
 
-    void Env_TileSystemComponent::GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible)
+    void Env_Tile::GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible)
     {
-        incompatible.push_back(AZ_CRC("Env_TileService"));
+        incompatible.push_back(AZ_CRC("Environment_Tile_System_v2Service"));
     }
 
-    void Env_TileSystemComponent::GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required)
+    void Env_Tile::GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required)
     {
         (void)required;
     }
 
-    void Env_TileSystemComponent::GetDependentServices(AZ::ComponentDescriptor::DependencyArrayType& dependent)
+    void Env_Tile::GetDependentServices(AZ::ComponentDescriptor::DependencyArrayType& dependent)
     {
         (void)dependent;
     }
 
-
-	
-	
-	///////////////////////////////////////////////////////////
-	//Component Interface Functions
-	///////////////////////////////////////////////////////////
-    void Env_TileSystemComponent::Init(){}
-
-    void Env_TileSystemComponent::Activate()
+    void Env_Tile::Init()
     {
-		const AZ::EntityId eid = GetEntityId();
-        Env_TileRequestBus::Handler::BusConnect(eid);
     }
 
-    void Env_TileSystemComponent::Deactivate()
+    void Env_Tile::Activate()
     {
-        Env_TileRequestBus::Handler::BusDisconnect();
+        Environment_Tile_System_v2RequestBus::Handler::BusConnect();
     }
-	*/
-#pragma endregion PHASEOUT
 
-	///////////////////////////////////////////////////////////
-	//CLASS: ENV_TileGenerator
-	///////////////////////////////////////////////////////////
+    void Env_Tile::Deactivate()
+    {
+        Environment_Tile_System_v2RequestBus::Handler::BusDisconnect();
+    }*/
 #pragma region Component
-	Env_TileGenerator::Env_TileGenerator(){
+	Env_TileGenerator::Env_TileGenerator() {
 		//Taken from SpawnerComponent. Not sure what this does yet
-		for (auto iter = sliceList.begin(); iter != sliceList.end(); iter++){
+		for (auto iter = sliceList.begin(); iter != sliceList.end(); iter++) {
 			iter->SetFlags(static_cast<AZ::u8>(AZ::Data::AssetFlags::OBJECTSTREAM_NO_LOAD));
 		}
 		/*for (auto v : sliceList){
-			for (auto iter = v.begin(); iter != v.end(); iter++){
-				iter->SetFlags(static_cast<AZ::u8>(AZ::Data::AssetFlags::OBJECTSTREAM_NO_LOAD));
-			}
+		for (auto iter = v.begin(); iter != v.end(); iter++){
+		iter->SetFlags(static_cast<AZ::u8>(AZ::Data::AssetFlags::OBJECTSTREAM_NO_LOAD));
+		}
 		}*/
 	}
 
@@ -131,7 +101,7 @@ namespace Env_Tile
 				//Generator Params
 				->Field("GridRowSize", &Env_TileGenerator::maxRowSize)
 				->Field("MaxTiles", &Env_TileGenerator::maxTiles)
-				
+
 				//Editor UI List Access
 				->Field("ListIndex", &Env_TileGenerator::listIndex)
 				->Field("ListSize", &Env_TileGenerator::listSize)
@@ -140,7 +110,7 @@ namespace Env_Tile
 				->Field("tmpScale", &Env_TileGenerator::offscale)
 				->Field("xOffset", &Env_TileGenerator::xOffset)
 				->Field("yOffset", &Env_TileGenerator::yOffset)
-								
+
 				//Editor UI Exclusive Fields
 				->Field("SpawnMethod", &Env_TileGenerator::sp_Method)
 				->Field("SpawnType", &Env_TileGenerator::sp_Type)
@@ -179,7 +149,7 @@ namespace Env_Tile
 
 			if (AZ::EditContext* ec = serialize->GetEditContext())
 			{
-				ec->Class<Env_TileGenerator>("Env_Generator", "Generates environment tiles as dynamic slices")
+				ec->Class<Env_TileGenerator>("Env_Generator v2", "Generates environment tiles as dynamic slices")
 					->ClassElement(AZ::Edit::ClassElements::EditorData, "")
 					->Attribute(AZ::Edit::Attributes::Category, "Environment Tile System")
 					->Attribute(AZ::Edit::Attributes::AppearsInAddComponentMenu, AZ_CRC("Game"))
@@ -189,7 +159,7 @@ namespace Env_Tile
 
 					->ClassElement(GRP, "Generator PCG")
 					->Attribute(AZ::Edit::Attributes::AutoExpand, true)
-					
+
 					->DataElement(UI_SP, &Env_TileGenerator::maxRowSize, "Max Row Length", "Maximum row length before starting a new row. Ignored for Manual mode.")
 					->Attribute("Min", 1)
 					->Attribute("Max", 20)//Subject to change. Dimension of 20 seems small...
@@ -213,12 +183,12 @@ namespace Env_Tile
 
 					->DataElement(UI_SL, &Env_TileGenerator::xOffset, "Grid X Offset", "Offset amount to accumulate on the global X axis for each consecutive slice.")
 					->DataElement(UI_SL, &Env_TileGenerator::yOffset, "Grid Y Offset", "Offset amount to accumulate on the global Y axis for each consecutive slice.")
-					
+
 					//Per Instance Local Transform Offset
 					->ClassElement(GRP, "Local Transform Offset")
-					
+
 					->DataElement(UI_SP, &Env_TileGenerator::listIndex, "Tile Index", "Tile which is to have its properties modified. [Manual Mode only]")
-					->Attribute("Min",0)
+					->Attribute("Min", 0)
 					->Attribute("Max", &Env_TileGenerator::listSize)
 					->Attribute(CN, &Env_TileGenerator::onListIndexChanged)
 
@@ -300,12 +270,12 @@ namespace Env_Tile
 					->Attribute(AZ::Edit::Attributes::Step, 1)
 					->Attribute(CN, &Env_TileGenerator::OnSnowStopTODChanged)
 					//Seperate Slice List for UI Visibiltiy Toggle Behavior for above sections
-					->ClassElement(GRP, "Slice Lists")//Unnecessary Group Section
+					->ClassElement(GRP, "Slice Lists")
 					->DataElement(UI_D, &Env_TileGenerator::sliceList, "Base Slice List", "List of generated base slices")
 					->Attribute(CN, &Env_TileGenerator::onListLengthChanged)
 					//Floating Islands
 					->DataElement(UI_D, &Env_TileGenerator::decoLayer, "Decorative Layer Slice List", "Slices to spawn on top of base tile.")
-					
+
 					;
 
 			}
@@ -314,12 +284,12 @@ namespace Env_Tile
 
 	void Env_TileGenerator::GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided)
 	{
-		provided.push_back(AZ_CRC("Env_TileService"));
+		provided.push_back(AZ_CRC("EnvTileService"));
 	}
 
 	void Env_TileGenerator::GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible)
 	{
-		incompatible.push_back(AZ_CRC("Env_TileService"));
+		incompatible.push_back(AZ_CRC("EnvTileService"));
 	}
 
 	void Env_TileGenerator::GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required)
@@ -332,14 +302,14 @@ namespace Env_Tile
 		dependent.push_back(AZ_CRC("TransformService"));
 	}
 #pragma endregion Component
-	
+
 #pragma region UI and Node
-	int Env_TileGenerator::getSimple(){
+	int Env_TileGenerator::getSimple() {
 		//Output will be 0,1,2 or 3
 		return (int)Cloudy + (2 * (int)Windy);
 	}
 
-	int Env_TileGenerator::getRainStrengths(){
+	int Env_TileGenerator::getRainStrengths() {
 		int result = 0;
 		//Treat as binary bitmask (8bit)
 		if (rain_strength_light) result += 1;
@@ -349,19 +319,19 @@ namespace Env_Tile
 		return result;
 	}
 
-	int Env_TileGenerator::getRainExtra(){
+	int Env_TileGenerator::getRainExtra() {
 		return (int)rain_extra_Thunder + (2 * (int)rain_extra_Lightning);
 	}
 
-	int Env_TileGenerator::getRainTODStart(){
+	int Env_TileGenerator::getRainTODStart() {
 		return rain_TOD_Range_Start;
 	}
 
-	int Env_TileGenerator::getRainTODStop(){
+	int Env_TileGenerator::getRainTODStop() {
 		return rain_TOD_Range_Stop;
 	}
 
-	int Env_TileGenerator::getSnowStrengths(){
+	int Env_TileGenerator::getSnowStrengths() {
 		int result = 0;
 		//Same as rain: 8bit bitmask
 		if (snow_strength_light) result += 1;
@@ -371,64 +341,64 @@ namespace Env_Tile
 		return result;
 	}
 
-	bool Env_TileGenerator::getSnowFreezeGround(){
+	bool Env_TileGenerator::getSnowFreezeGround() {
 		return snow_extra_FreezeGround;
 	}
 
-	float Env_TileGenerator::getSnowFreezeAmount(){
+	float Env_TileGenerator::getSnowFreezeAmount() {
 		return snow_extra_FreezeAmount;
 	}
 
-	int Env_TileGenerator::getSnowTODStart(){
+	int Env_TileGenerator::getSnowTODStart() {
 		return snow_TOD_Range_Start;
 	}
 
-	int Env_TileGenerator::getSnowTODStop(){
+	int Env_TileGenerator::getSnowTODStop() {
 		return snow_TOD_Range_Stop;
 	}
 
-	int Env_TileGenerator::setSimple(bool cloudy, bool windy){
+	int Env_TileGenerator::setSimple(bool cloudy, bool windy) {
 		Cloudy = cloudy;
 		Windy = windy;
 		return getSimple();
 	}
 
-	int Env_TileGenerator::setRainStrengths(bool low, bool mid, bool hi){
+	int Env_TileGenerator::setRainStrengths(bool low, bool mid, bool hi) {
 		rain_strength_light = low;
 		rain_strength_medium = mid;
 		rain_strength_heavy = hi;
 		return getRainStrengths();
 	}
 
-	int Env_TileGenerator::setRainExtra(bool thunder, bool lightning){
+	int Env_TileGenerator::setRainExtra(bool thunder, bool lightning) {
 		rain_extra_Thunder = thunder;
 		rain_extra_Lightning = lightning;
 		return getRainExtra();
 	}
 
-	int Env_TileGenerator::setRainTODStart(int val){
+	int Env_TileGenerator::setRainTODStart(int val) {
 		rain_TOD_Range_Start = val;
 		return rain_TOD_Range_Start;
 	}
 
-	int Env_TileGenerator::setRainTODStop(int val){
+	int Env_TileGenerator::setRainTODStop(int val) {
 		rain_TOD_Range_Stop = val;
 		return rain_TOD_Range_Stop;
 	}
 
-	int Env_TileGenerator::setSnowStrengths(bool low, bool mid, bool hi){
+	int Env_TileGenerator::setSnowStrengths(bool low, bool mid, bool hi) {
 		snow_strength_light = low;
 		snow_strength_medium = mid;
 		snow_strength_heavy = hi;
 		return getSnowStrengths();
 	}
 
-	bool Env_TileGenerator::setSnowFreezeGround(bool freeze){
+	bool Env_TileGenerator::setSnowFreezeGround(bool freeze) {
 		snow_extra_FreezeGround = freeze;
 		return snow_extra_FreezeGround;
 	}
 
-	float Env_TileGenerator::setSnowFreezeAmount(float amt){
+	float Env_TileGenerator::setSnowFreezeAmount(float amt) {
 		snow_extra_FreezeAmount = amt;
 		return snow_extra_FreezeAmount;
 	}
@@ -438,7 +408,7 @@ namespace Env_Tile
 		return snow_TOD_Range_Start;
 	}
 
-	int Env_TileGenerator::setSnowTODStop(int val){
+	int Env_TileGenerator::setSnowTODStop(int val) {
 		snow_TOD_Range_Stop = val;
 		return snow_TOD_Range_Stop;
 	}
@@ -446,42 +416,42 @@ namespace Env_Tile
 	///////////////////////////////////////////////////////////
 	//UI NotifyFunctions
 	///////////////////////////////////////////////////////////
-	void Env_TileGenerator::checkRainEnabled(){
+	void Env_TileGenerator::checkRainEnabled() {
 		if (rain_strength_light || rain_strength_medium || rain_strength_heavy)
 			RAIN_ENABLED = true;
 		else
 			RAIN_ENABLED = false;
 	}
 
-	AZ::u32 Env_TileGenerator::OnRainStartTODChanged(){
+	AZ::u32 Env_TileGenerator::OnRainStartTODChanged() {
 		//Ensure bound integrity is maintained
 		if (rain_TOD_Range_Start > rain_TOD_Range_Stop)
 			rain_TOD_Range_Stop = rain_TOD_Range_Start;
 		return AZ_CRC("RefreshValues");
 	}
 
-	AZ::u32 Env_TileGenerator::OnRainStopTODChanged(){
+	AZ::u32 Env_TileGenerator::OnRainStopTODChanged() {
 		//Ensure bound integrity is maintained
 		if (rain_TOD_Range_Start > rain_TOD_Range_Stop)
 			rain_TOD_Range_Start = rain_TOD_Range_Stop;
 		return AZ_CRC("RefreshValues");
 	}
 
-	AZ::u32 Env_TileGenerator::OnSnowStartTODChanged(){
+	AZ::u32 Env_TileGenerator::OnSnowStartTODChanged() {
 		//Ensure bound integrity is maintained
 		if (snow_TOD_Range_Start > snow_TOD_Range_Stop)
 			snow_TOD_Range_Stop = snow_TOD_Range_Start;
 		return AZ_CRC("RefreshValues");
 	}
 
-	AZ::u32 Env_TileGenerator::OnSnowStopTODChanged(){
+	AZ::u32 Env_TileGenerator::OnSnowStopTODChanged() {
 		//Ensure bound integrity is maintained
 		if (snow_TOD_Range_Start > snow_TOD_Range_Stop)
 			snow_TOD_Range_Start = snow_TOD_Range_Stop;
 		return AZ_CRC("RefreshValues");
 	}
-	
-	AZ::u32 Env_TileGenerator::onListIndexChanged(){
+
+	AZ::u32 Env_TileGenerator::onListIndexChanged() {
 		//Show the selected slice's transform on editor panel
 		CryLog("List Index Changed!");
 		AZ::Transform t = sliceLocalTransforms[listIndex];
@@ -492,15 +462,15 @@ namespace Env_Tile
 		return AZ_CRC("RefreshAttributesAndValues");
 	}
 
-	AZ::u32 Env_TileGenerator::onListLengthChanged(){
+	AZ::u32 Env_TileGenerator::onListLengthChanged() {
 		//Transform list must have same number of entries as the Slice List
-		if (sliceList.size() > sliceLocalTransforms.size()){
+		if (sliceList.size() > sliceLocalTransforms.size()) {
 			//Added new slice entry -> add new transform
 			AZ::Transform t = AZ::Transform::Identity();
 
 			sliceLocalTransforms.push_back(t);
 		}
-		else if (sliceList.size() < sliceLocalTransforms.size()){
+		else if (sliceList.size() < sliceLocalTransforms.size()) {
 			//Otherwise shrink the array down to the proper size and drop all entries with out of bounds indices
 			sliceLocalTransforms.resize(sliceList.size());
 			//BUG:(Potential): Deleting an entry from the middle may skew the transform list
@@ -508,7 +478,7 @@ namespace Env_Tile
 		return AZ_CRC("RefreshAttributesAndValues");
 	}
 
-	AZ::u32 Env_TileGenerator::onLocalTransformChanged(){
+	AZ::u32 Env_TileGenerator::onLocalTransformChanged() {
 		//Update the local transform entry in the list when the panel entries for local transforms change.
 		CryLog("Local Transform Changed!");
 		AZ::Transform t = AZ::Transform::Identity();
@@ -526,18 +496,18 @@ namespace Env_Tile
 	///////////////////////////////////////////////////////////
 	//EBUS Generator Functions
 	///////////////////////////////////////////////////////////
-	AzFramework::SliceInstantiationTicket Env_TileGenerator::Gen_SpawnSlice(const AZ::Data::Asset<AZ::Data::AssetData>& slice){
+	AzFramework::SliceInstantiationTicket Env_TileGenerator::Gen_SpawnSlice(const AZ::Data::Asset<AZ::Data::AssetData>& slice) {
 		return SpawnSliceInternal(slice, AZ::Transform::Identity());
 	}
-	
-	AzFramework::SliceInstantiationTicket Env_TileGenerator::Gen_SpawnSliceRelative(const AZ::Data::Asset<AZ::Data::AssetData>& slice, const AZ::Transform& relative){
+
+	AzFramework::SliceInstantiationTicket Env_TileGenerator::Gen_SpawnSliceRelative(const AZ::Data::Asset<AZ::Data::AssetData>& slice, const AZ::Transform& relative) {
 		return SpawnSliceInternal(slice, relative);
 	}
 
 	///////////////////////////////////////////////////////////
 	//SliceInstantiationResultBus Functions
 	///////////////////////////////////////////////////////////
-	void Env_TileGenerator::OnSliceInstantiated(const AZ::Data::AssetId& sliceAssetId, const AZ::PrefabComponent::PrefabInstanceAddress& sliceAddress){
+	void Env_TileGenerator::OnSliceInstantiated(const AZ::Data::AssetId& sliceAssetId, const AZ::PrefabComponent::PrefabInstanceAddress& sliceAddress) {
 		//Taken from SpawnerComponent: spawns all entities packaged in the slice.
 		const AzFramework::SliceInstantiationTicket& ticket = (*AzFramework::SliceInstantiationResultBus::GetCurrentBusId());
 
@@ -560,14 +530,14 @@ namespace Env_Tile
 		EBUS_EVENT_ID(GetEntityId(), Env_TileNotificationBus, OnSpawned, ticket, entityIds);
 	}
 
-	void Env_TileGenerator::OnSliceInstantiationFailed(const AZ::Data::AssetId& sliceAssetId){
+	void Env_TileGenerator::OnSliceInstantiationFailed(const AZ::Data::AssetId& sliceAssetId) {
 		AzFramework::SliceInstantiationResultBus::MultiHandler::BusDisconnect(*AzFramework::SliceInstantiationResultBus::GetCurrentBusId());
 		AZ_Error("Env_TileGenerator", false, "Slice '%s' failed to instantiate", sliceAssetId.ToString<AZStd::string>().c_str());
 	}
 #pragma endregion EBus
-	
+
 #pragma region Component Overrides
-	void Env_TileGenerator::Init(){}
+	void Env_TileGenerator::Init() {}
 
 	void Env_TileGenerator::Activate()
 	{
@@ -580,14 +550,14 @@ namespace Env_Tile
 		//Get number of loop iterations based on spawnType setting
 		int loopLength = sp_Type == spawnType::Once ? sliceList.size() : maxTiles;
 		AZ::Vector3 accumulatedOffset = AZ::Vector3::CreateZero();//Accumulates the offset used to determine grid position.
-		
-		//Loop through the list and spawn after constructing proper transforms.
-		for (int i = 0; i < loopLength; i++){
+
+																  //Loop through the list and spawn after constructing proper transforms.
+		for (int i = 0; i < loopLength; i++) {
 			AZ::Data::Asset<AZ::DynamicPrefabAsset> sliceToSpawn;
 			AZ::Transform sliceTransform = AZ::Transform::Identity();
 
 			//Select Slice
-			if (sp_Method == spawnMethod::Randomized){
+			if (sp_Method == spawnMethod::Randomized) {
 				CryLog("DEBUG: Generating Random Int");
 				srand((int)time(NULL));
 				int rand_index = rand() % sliceList.size();
@@ -596,22 +566,22 @@ namespace Env_Tile
 			else sliceToSpawn = sliceList[i%sliceList.size()];
 
 			//Construct Transform
-			if (sp_Method == spawnMethod::Manual){
+			if (sp_Method == spawnMethod::Manual) {
 				CryLog("Manual Mode: Will use Local Transform only.");
 				sliceTransform = sliceLocalTransforms[i%sliceList.size()];
 			}
-			else{
+			else {
 				CryLog("Ordered Mode or Randomized Mode: Use Accumulating Constant Offset.");
 				//Handle Row Switch
-				if (i){//Ignore initial iteration at grid space (0,0)
-					if (i%maxRowSize == 0){
+				if (i) {//Ignore initial iteration at grid space (0,0)
+					if (i%maxRowSize == 0) {
 						CryLog("Starting new row...");
 						accumulatedOffset.SetX(0.0);
 						accumulatedOffset.SetY(accumulatedOffset.GetY() + (float)yOffset);
 						CryLog("Current X: %f", accumulatedOffset.GetX());
 						CryLog("Current Y: %f", accumulatedOffset.GetY());
 					}
-					else{
+					else {
 						CryLog("Accumulating offset for current row");
 						accumulatedOffset.SetX(accumulatedOffset.GetX() + (float)xOffset);
 						CryLog("Current X: %f", accumulatedOffset.GetX());
@@ -620,7 +590,7 @@ namespace Env_Tile
 				}
 				//Set the grid space location.
 				sliceTransform.SetPosition(accumulatedOffset);
-				
+
 			}
 			//Spawn Slice
 			Gen_SpawnSliceRelative(sliceToSpawn, sliceTransform);
@@ -630,8 +600,8 @@ namespace Env_Tile
 			//NOTE: ALL SUB-SLICES ARE SPAWNED. TO BYPASS THIS FOR VARIATIONS OF A SINGLE MODEL,
 			//	REPEAT THE SLICES IN THE BASE SLICE LIST
 			int tmp_sub_obj_count = 0;
-			if (decoLayer[i%sliceList.size()].size() > 0){
-				for (auto item : decoLayer[i%sliceList.size()]){
+			if (decoLayer.size()>0 && decoLayer[i%sliceList.size()].size() > 0) {
+				for (auto item : decoLayer[i%sliceList.size()]) {
 					//Spawn at Tile Location (NOTE: BUILD SLICES ACCORDINGLY)
 					Gen_SpawnSliceRelative(item, sliceTransform);
 					CryLog("Base Tile %i: Spawned Sub Slice %i", i, tmp_sub_obj_count);
@@ -640,7 +610,7 @@ namespace Env_Tile
 			}
 		}
 
-		
+
 
 		//PostActivate();
 	}
@@ -653,8 +623,8 @@ namespace Env_Tile
 #pragma endregion Component Overrides
 
 #pragma region Helper Functions
-	void Env_TileGenerator::PostActivate(){
-		for (int i = 0; i < 25; i++){ //[0-24]
+	void Env_TileGenerator::PostActivate() {
+		for (int i = 0; i < 25; i++) { //[0-24]
 			WeatherTrigger tmp;
 			tmp.triggerTime = i;
 			env_weather_trigger.push_back(tmp);
@@ -787,7 +757,7 @@ namespace Env_Tile
 		//}
 	}
 
-	void Env_TileGenerator::preloadTriggersAtTime(int tod){
+	void Env_TileGenerator::preloadTriggersAtTime(int tod) {
 		/*CryLog("Loading Triggers for Time: %i", tod);
 		for (WeatherUnit w : env_weather_trigger[tod].triggerList){
 		queueTriggers.push_back(w);//Manually push back instead of using op= to copy
@@ -795,7 +765,7 @@ namespace Env_Tile
 		CryLog("Loaded %i Triggers", env_weather_trigger[tod].triggerList.size());*/
 	}
 
-	WeatherUnit Env_TileGenerator::processNextTrigger(){
+	WeatherUnit Env_TileGenerator::processNextTrigger() {
 
 		//[REPLACE LIST LOADING WITH ITERATOR IMPLEMENTATION]
 
@@ -804,13 +774,13 @@ namespace Env_Tile
 		queueTriggers.pop_front();
 		return w;
 	}
-	
-	AzFramework::SliceInstantiationTicket Env_TileGenerator::SpawnSliceInternal(const AZ::Data::Asset<AZ::Data::AssetData>& slice, const AZ::Transform& relative){
+
+	AzFramework::SliceInstantiationTicket Env_TileGenerator::SpawnSliceInternal(const AZ::Data::Asset<AZ::Data::AssetData>& slice, const AZ::Transform& relative) {
 		//Taken from SpawnerComponent
 
 		AZ::Transform t = AZ::Transform::Identity();
 
-		EBUS_EVENT_ID_RESULT(t, GetEntityId(), AZ::TransformBus,GetWorldTM);
+		EBUS_EVENT_ID_RESULT(t, GetEntityId(), AZ::TransformBus, GetWorldTM);
 
 		t *= relative;
 
@@ -822,5 +792,4 @@ namespace Env_Tile
 		return ticket;
 	}
 #pragma endregion Helper Functions
-
 }

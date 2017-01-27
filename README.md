@@ -11,11 +11,12 @@ Part I: Adding Files To Your Project
 Env_Tile which is the Gem itself, FlowGraphs which has relevant flowgraphs, and FlowNodes which has the C++ definitions for
 custom flownodes associated with the Gem.		
 		
---Copy the Env_Tile folder into <Lumberyard Root>/1.6.0.0/dev/Gems. Next, copy the FlowGraphs folder into your project's 
-directory. So if your project is named "test", the folder would be found at the location <Lumberyard>/1.6.0.0/dev/test.		
+--Copy the EnvironmentTileSystem folder into <Lumberyard Root>/1.7.0.0/dev/Gems. Next, copy the FlowGraphs folder into your project's 
+directory. So if your project is named "test", the folder would be found at the location <Lumberyard>/1.7.0.0/dev/test.		
 
 --Navigate into the FlowNodes folder and copy all of the C++ header and source files to 
 <Lumberyard>/1.6.0.0/dev/Code/Cryengine/CryAction/FlowSystem/Nodes/ComponentEntityNodes		
+NOTE: FlowGraph use should be replaced with Lua ScriptBinding [will be added in later]		
 		
 --Next, open up the Lumberyard Project Configurator, click on your project (which from now I will refer to as "test") 
 and then click on "Enable Gems". The following Gems can be enabled.		
@@ -25,7 +26,7 @@ Camera
 Camera Framework		
 Cloud Canvas		
 Clouds		
-Env_Tile (if you do not see this option you may have pasted the Env_Tile folder in the wrong place)		
+Environment_Tile_System_v2(if you do not see this option you may have pasted the Env_Tile folder in the wrong place)		
 Game Effect System		
 Input Management Framework		
 Lightning Arc		

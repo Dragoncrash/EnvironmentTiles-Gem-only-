@@ -1,7 +1,0 @@
-{
-    "auto": {
-        "Tests": [
-            "Tests/Env_TileTest.cpp"
-        ]
-    }
-}

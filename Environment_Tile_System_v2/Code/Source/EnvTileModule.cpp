@@ -2,26 +2,24 @@
 #include "StdAfx.h"
 #include <platform_impl.h>
 
-#include "Env_TileSystemComponent.h"
-#include <Env_Tile/Env_TileBus.h>
+#include "EnvTile.h"
 
 #include <IGem.h>
 
-namespace Env_Tile
+namespace EnvTile
 {
-    class Env_TileModule
+    class Environment_Tile_System_v2Module
         : public CryHooksModule
     {
     public:
-        AZ_RTTI(Env_TileModule, "{13D41E5E-DAC3-400F-83C0-028ECFE7C1E1}", CryHooksModule);
+        AZ_RTTI(Environment_Tile_System_v2Module, "{5BB0007E-F494-4A53-AA2B-D127F7B26448}", CryHooksModule);
 
-        Env_TileModule()
+        Environment_Tile_System_v2Module()
             : CryHooksModule()
         {
             // Push results of [MyComponent]::CreateDescriptor() into m_descriptors here.
             m_descriptors.insert(m_descriptors.end(), {
-                //Env_TileSystemComponent::CreateDescriptor(),
-				Env_TileGenerator::CreateDescriptor(),
+                Env_TileGenerator::CreateDescriptor(),
             });
         }
 
@@ -40,4 +38,4 @@ namespace Env_Tile
 // DO NOT MODIFY THIS LINE UNLESS YOU RENAME THE GEM
 // The first parameter should be GemName_GemIdLower
 // The second should be the fully qualified name of the class above
-AZ_DECLARE_MODULE_CLASS(Env_Tile_a290d1afec6044d5a35898a12dcd7859, Env_Tile::Env_TileModule)
+AZ_DECLARE_MODULE_CLASS(Environment_Tile_System_v2_af4435841bcf4e6f8c84b7188a870b6e, EnvTile::Environment_Tile_System_v2Module)

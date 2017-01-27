@@ -4,22 +4,22 @@
 #include <AzCore/Component/Component.h>
 #include <AzCore/Prefab/PrefabAsset.h>
 #include <AzCore/Math/Transform.h>
-//Buses
-#include <AzCore/Component/ComponentBus.h>
-#include <AzFramework/Entity/EntityContextBus.h>
-#include <Env_Tile/Env_TileBus.h>
 #include <algorithm>
-#include <Env_Tile/WeatherStructs.h>
+#include <Environment_Tile_System_v2/WeatherStructs.h>
 
+#include <Environment_Tile_System_v2/EnvTileBus.h>
+#include <AzFramework/Entity/EntityContextBus.h>
+#include <AzCore/Component/ComponentBus.h>
 
-namespace Env_Tile
+namespace EnvTile
 {
-   /* class Env_TileSystemComponent
-        : public AZ::Component
-        , protected Env_TileRequestBus::Handler
-    {
+	/*class Env_TileGenerator
+		: public AZ::Component
+		, protected Env_GeneratorRequestBus::Handler
+		, private AzFramework::SliceInstantiationResultBus::MultiHandler
+	{
     public:
-        AZ_COMPONENT(Env_TileSystemComponent, "{DED97B4B-2D55-4F59-A48A-ACA87E5B6710}");
+        AZ_COMPONENT(Env_TileGenerator, "{A03A8932-D4E4-4766-A536-8CA8C280C7BD}");
 
         static void Reflect(AZ::ReflectContext* context);
 
@@ -28,30 +28,28 @@ namespace Env_Tile
         static void GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required);
         static void GetDependentServices(AZ::ComponentDescriptor::DependencyArrayType& dependent);
 
-		
     protected:
-       
+        ////////////////////////////////////////////////////////////////////////
+        // Environment_Tile_System_v2RequestBus interface implementation
+
+        ////////////////////////////////////////////////////////////////////////
+
         ////////////////////////////////////////////////////////////////////////
         // AZ::Component interface implementation
         void Init() override;
         void Activate() override;
         void Deactivate() override;
         ////////////////////////////////////////////////////////////////////////
-
-	private:	
-		
-    };
-	*/
-	
+    };*/
 	class Env_TileGenerator
 		: public AZ::Component
 		, protected Env_GeneratorRequestBus::Handler
 		, private AzFramework::SliceInstantiationResultBus::MultiHandler
 	{
 	public:
-		AZ_COMPONENT(Env_TileGenerator, "{95801997-903E-4BC3-80F8-0CE58975E052}")
+		AZ_COMPONENT(Env_TileGenerator, "{A03A8932-D4E4-4766-A536-8CA8C280C7BD}")
 
-		Env_TileGenerator();
+			Env_TileGenerator();
 		~Env_TileGenerator() override = default;
 
 		static void Reflect(AZ::ReflectContext* context);
@@ -74,11 +72,11 @@ namespace Env_Tile
 		void OnSliceInstantiationFailed(const AZ::Data::AssetId& sliceAssetId) override;
 		//////////////////////////////////////////////////////////////////////////
 
-	protected:		
+	protected:
 		////////////////////////////////////////////////////////////////////////
 		// Node Functions
-		int getRowSize() override{ return maxRowSize; }
-		int getMaxTiles() override{ return maxTiles; }
+		int getRowSize() override { return maxRowSize; }
+		int getMaxTiles() override { return maxTiles; }
 		int getXOffset() override { return xOffset; }
 		int getYOffset() override { return yOffset; }
 		bool getRepetition() override { return sp_Type == spawnType::Repeat; }
@@ -90,7 +88,7 @@ namespace Env_Tile
 		AZ::u32 onListIndexChanged();
 		AZ::u32 onListLengthChanged();
 		AZ::u32 onLocalTransformChanged();
-		AZ::u32 onConstTransformChanged();
+		//AZ::u32 onConstTransformChanged();
 		////////////////////////////////////////////////////////////////////////
 
 		////////////////////////////////////////////////////////////////////////
@@ -139,16 +137,16 @@ namespace Env_Tile
 
 		////////////////////////////////////////////////////////////////////////
 		// UI Enum Fields
-		enum class spawnMethod{
+		enum class spawnMethod {
 			Randomized, //Select Slice to Spawn from list randomly with constant transform offset.
 			Ordered,	//Select Slices in order from list with constant transform offset.
 			Manual		//Select Slices in order from list with manual transforms
 		};
-		enum class spawnType{
+		enum class spawnType {
 			Once,		//Goes through the list of Slices once and spawns each entry.
 			Repeat		//Loops through the list of Slices until the maximum specified number of tiles are spawned.
 		};
-		
+
 		////////////////////////////////////////////////////////////////////////
 
 		//Ids of spawned entities
@@ -159,17 +157,17 @@ namespace Env_Tile
 		//First builds trigger list and order [PHASEOUT]
 		AZStd::vector<WeatherTrigger> env_weather_trigger;
 		AZStd::deque<WeatherUnit>queueTriggers;
-		
+
 
 		int initialTime = 0;//Time at game start.
 		int tmp_spawned_tiles = 0;//DEBUG: LOGGED TO CONSOLE
 
-		//Helper Functions
+								  //Helper Functions
 		void PostActivate();
 		//From Env_TileBus
 		void preloadTriggersAtTime(int tod) override;//[TODO]
 		WeatherUnit processNextTrigger() override;//[TODO]
-		bool triggerListEmpty() override{
+		bool triggerListEmpty() override {
 			return queueTriggers.empty();
 		}
 
@@ -191,7 +189,7 @@ namespace Env_Tile
 		AZStd::vector<AZ::Data::Asset<AZ::DynamicPrefabAsset>> sliceList;
 		int slice_layerID = 0, max_slice_layerID = 0;//For UI
 
-		//Editor UI access to Lists
+													 //Editor UI access to Lists
 		int listIndex = 0;
 		int listSize = 0;
 

@@ -3,55 +3,23 @@
 
 #include <AzCore/EBus/EBus.h>
 #include <AzCore/Component/ComponentBus.h>
-#include <AzCore/Asset/AssetDatabaseBus.h>//Not required
 #include <AzFramework/Entity/EntityContextBus.h>
 #include "WeatherStructs.h"
 
-namespace Env_Tile
+namespace EnvTile
 {
-    /*class Env_TileRequests //[DEPRECATED]
-        : public AZ::ComponentBus
+   /* class Environment_Tile_System_v2Requests
+        : public AZ::EBusTraits
     {
+
     public:
-        //////////////////////////////////////////////////////////////////////////
-        // EBusTraits overrides
         static const AZ::EBusHandlerPolicy HandlerPolicy = AZ::EBusHandlerPolicy::Single;
-        static const AZ::EBusAddressPolicy AddressPolicy = AZ::EBusAddressPolicy::ById;
-        //////////////////////////////////////////////////////////////////////////
-
-        // Put your public methods here
-		virtual ~Env_TileRequests(){}
-
-		//[MOVED TO GENERATOR]
-		
-		//Get Functions
-		virtual int getSimple() = 0;
-		virtual int getRainStrengths() = 0;
-		virtual int getRainExtra() = 0;
-		virtual int getRainTODStart() = 0;
-		virtual int getRainTODStop() = 0;
-		virtual int getSnowStrengths() = 0;
-		virtual bool getSnowFreezeGround() = 0;
-		virtual float getSnowFreezeAmount() = 0;
-		virtual int getSnowTODStart() = 0;
-		virtual int getSnowTODStop() = 0;
-
-		//Set Functions
-		virtual int setSimple(bool,bool) = 0;
-		virtual int setRainStrengths(bool,bool,bool) = 0;
-		virtual int setRainExtra(bool,bool) = 0;
-		virtual int setRainTODStart(int) = 0;
-		virtual int setRainTODStop(int) = 0;
-		virtual int setSnowStrengths(bool,bool,bool) = 0;
-		virtual bool setSnowFreezeGround(bool) = 0;
-		virtual float setSnowFreezeAmount(float) = 0;
-		virtual int setSnowTODStart(int) = 0;
-		virtual int setSnowTODStop(int) = 0;
-		
-		
+        static const AZ::EBusAddressPolicy AddressPolicy = AZ::EBusAddressPolicy::Single;
+        // Public functions
     };
-using Env_TileRequestBus = AZ::EBus<Env_TileRequests>;
-*/
+    using Environment_Tile_System_v2RequestBus = AZ::EBus<Environment_Tile_System_v2Requests>;
+	*/
+
 	class Env_GeneratorRequests : public AZ::ComponentBus
 	{
 	public:
@@ -60,8 +28,8 @@ using Env_TileRequestBus = AZ::EBus<Env_TileRequests>;
 		static const AZ::EBusHandlerPolicy HandlerPolicy = AZ::EBusHandlerPolicy::Single;
 		static const AZ::EBusAddressPolicy AddressPolicy = AZ::EBusAddressPolicy::ById;
 		//////////////////////////////////////////////////////////////////////////
-		virtual ~Env_GeneratorRequests(){}
-		
+		virtual ~Env_GeneratorRequests() {}
+
 		//GENERATOR Spawn Events
 		virtual AzFramework::SliceInstantiationTicket Gen_SpawnSlice(const AZ::Data::Asset<AZ::Data::AssetData>& slice) = 0;
 		virtual AzFramework::SliceInstantiationTicket Gen_SpawnSliceRelative(const AZ::Data::Asset<AZ::Data::AssetData>& slice, const AZ::Transform& relative) = 0;
@@ -110,9 +78,10 @@ using Env_TileRequestBus = AZ::EBus<Env_TileRequests>;
 	class Env_TileNotifications : public AZ::ComponentBus
 	{
 	public:
-		virtual ~Env_TileNotifications(){}
+		virtual ~Env_TileNotifications() {}
 
 		virtual void OnSpawned(const AzFramework::SliceInstantiationTicket& ticket, const AZStd::vector<AZ::EntityId>& spawnedEntities) = 0;
 	};
 	using Env_TileNotificationBus = AZ::EBus<Env_TileNotifications>;
-} 
+
+} // namespace Environment_Tile_System_v2

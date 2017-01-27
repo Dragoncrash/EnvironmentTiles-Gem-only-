@@ -3,7 +3,7 @@
 
 #include <AzTest/AzTest.h>
 
-class Env_TileTest
+class Environment_Tile_System_v2Test
     : public ::testing::Test
 {
 protected:
@@ -18,7 +18,7 @@ protected:
     }
 };
 
-TEST_F(Env_TileTest, ExampleTest)
+TEST_F(Environment_Tile_System_v2Test, ExampleTest)
 {
     ASSERT_TRUE(true);
 }
