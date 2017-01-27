@@ -15,8 +15,18 @@ custom flownodes associated with the Gem.
 directory. So if your project is named "test", the folder would be found at the location <Lumberyard>/1.7.0.0/dev/test.		
 
 --Navigate into the FlowNodes folder and copy all of the C++ header and source files to 
-<Lumberyard>/1.6.0.0/dev/Code/Cryengine/CryAction/FlowSystem/Nodes/ComponentEntityNodes		
-NOTE: FlowGraph use should be replaced with Lua ScriptBinding [will be added in later]		
+
+<Lumberyard>/1.7.0.0/dev/Code/Cryengine/CryAction/FlowSystem/Nodes/ComponentEntityNodes	
+		
+--Add in the FlowNode files to the WAF system list for CryAction. This can be done by editing		
+<Lumberyard>/1.7.0.0/dev/Code/Cryengine/CryAction/cryaction.waf_files		
+in a text editor. Add the following lines in the "Flow System/Nodes/ComponentEntityNodes" block:		
+"FlowSystem/Nodes/ComponentEntityNodes/EnvTileNode.cpp",		
+"FlowSystem/Nodes/ComponentEntityNodes/EnvTileNode.h",		
+"FlowSystem/Nodes/ComponentEntityNodes/CustomAdditions.cpp",		
+"FlowSystem/Nodes/ComponentEntityNodes/CustomAdditions.h"		
+		
+Make sure the last line does not accidentally end with a comma else you will get build errors.	
 		
 --Next, open up the Lumberyard Project Configurator, click on your project (which from now I will refer to as "test") 
 and then click on "Enable Gems". The following Gems can be enabled.		
